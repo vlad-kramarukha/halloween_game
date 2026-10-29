@@ -1,0 +1,12 @@
+.audio-controls { position: absolute; top: 20px; right: 82px; z-index: 40; display: flex; gap: 5px; color: rgb(242, 234, 248); font: 400 16px/1.4 "Oswald Variable", sans-serif; }
+.audio-controls button, .audio-controls summary { display: grid; place-items: center; box-sizing: border-box; width: 36px; height: 42px; padding: 0; border: 1px solid rgb(91, 66, 107); border-radius: 12px; background: rgb(33 27 46 / 94%); color: inherit; font-size: 22px; cursor: pointer; list-style: none; }
+.audio-controls summary::-webkit-details-marker { display: none; }
+.audio-controls button:hover, .audio-controls summary:hover { border-color: rgb(255, 167, 77); }
+.audio-controls button:focus-visible, .audio-controls summary:focus-visible, .audio-controls input:focus-visible { outline: 2px solid rgb(255, 195, 122); outline-offset: 3px; }
+.audio-controls details { position: relative; }
+.audio-controls__popup { position: absolute; top: 50px; right: 0; width: 210px; padding: 16px; border: 1px solid rgb(118, 80, 124); border-radius: 14px; background: rgb(33, 24, 45); box-shadow: 0 8px 24px rgb(0 0 0 / 45%); }
+.audio-controls label { display: grid; gap: 8px; }
+.audio-controls label + label { margin-top: 14px; }
+.audio-controls input { width: 100%; margin: 0; accent-color: rgb(255, 167, 77); cursor: pointer; }
+.game-ui .game-ui__exit-wrapper { margin-left: 94px; }
+@media (max-width: 600px) { .audio-controls { right: 74px; top: 20px; } }

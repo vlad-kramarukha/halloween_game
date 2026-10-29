@@ -1,0 +1,40 @@
+:root { color-scheme: dark; font: 15px/1.5 system-ui, sans-serif; color: #ede7f6; background: #100d18; }
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(ellipse at 10% 0, #30213d 0, transparent 55%); min-height: 100vh; }
+main { max-width: 1280px; margin: auto; padding: 40px 28px; }
+header, .toolbar, .room-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+h1 { font-size: clamp(24px, 4vw, 34px); margin: 0; letter-spacing: -.7px; } h2 { margin: 0 0 14px; font-size: 20px; }
+p { color: #b8adc9; margin: 8px 0 16px; } a { color: #ffc182; text-decoration: none; }
+.eyebrow { color: #efa354; font-size: 12px; font-weight: 750; letter-spacing: 3px; margin: 0 0 8px; }
+.card { padding: 24px; background: #211a2d; border: 1px solid #43344f; border-radius: 18px; }
+.login { max-width: 470px; margin: 50px auto; } label { display: grid; gap: 6px; }
+input, button { font: inherit; border-radius: 9px; border: 1px solid #584367; padding: 10px 14px; }
+input { background: #120e1b; color: #fff; min-width: 0; } input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid #ffc182; outline-offset: 3px; }
+button { cursor: pointer; background: #ef9c4f; color: #271a10; font-weight: 650; } button:hover { filter: brightness(1.1); }
+button:disabled { opacity: .5; cursor: wait; } button.secondary { background: #34283f; color: #e8dff2; }
+button.danger { background: #3d2332; color: #ffc0be; border-color: #754051; }
+#login-form button { width: 100%; margin-top: 20px; }
+#notice { min-height: 24px; margin: 22px 0 12px; color: #ffc182; } #notice.error { color: #ffabab; }
+.toolbar { margin-bottom: 16px; } .toolbar p { margin: 0; } .toolbar button + button { margin-left: 8px; }
+.layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; }
+#rooms { display: grid; gap: 10px; } .room-button { text-align: left; background: #2a2036; color: #e8dff2; word-break: break-word; }
+.room-button[aria-pressed=true] { border-color: #ef9c4f; background: #493144; }
+.room-button small { display: block; color: #c2b4cf; font-weight: normal; }
+.room-heading { align-items: flex-start; } #room-name { overflow-wrap: anywhere; } #room-status { margin-bottom: 0; }
+#room-help { font-size: 13px; margin-top: 18px; } .table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; text-align: left; } th { font-size: 12px; color: #b8adc9; font-weight: 500; white-space: nowrap; }
+th, td { padding: 14px 10px; border-bottom: 1px solid #3a2d46; } td:first-child { min-width: 130px; overflow-wrap: anywhere; }
+td small { display: block; color: #b8adc9; } .online { color: #99d7b5; } .offline { color: #b8adc9; }
+.move-form { display: flex; gap: 6px; } .move-form input { width: 78px; } .move-form button, td button { padding: 8px 10px; font-size: 13px; }
+footer { margin-top: 24px; color: #9689a6; font-size: 13px; } [hidden] { display: none !important; }
+@media (max-width: 850px) { .layout { grid-template-columns: 1fr; } #rooms { grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); } main { padding: 24px 16px; } header { align-items: flex-start; } .card { padding: 18px; } }
+
+.create-room { display: flex; align-items: end; gap: 16px; margin-bottom: 20px; }
+.create-room label { flex: 1; }
+.invitation { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 18px; margin-top: 20px; border: 1px solid #584367; border-radius: 12px; background: #191321; }
+.invitation > button { align-self: end; }
+.invitation > p { grid-column: 1 / -1; }
+.invitation p { margin: 0; font-size: 13px; }
+.invitation input { width: 100%; font-size: 13px; }
+@media (max-width: 650px) { .create-room { flex-direction: column; align-items: stretch; } .invitation { grid-template-columns: 1fr; } }
+.room-actions { display: flex; flex-wrap: wrap; gap: 10px; }

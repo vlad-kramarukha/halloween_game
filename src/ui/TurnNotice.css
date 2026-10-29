@@ -1,0 +1,27 @@
+.turn-notice {
+  position: absolute;
+  inset: 0;
+  z-index: 26;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: rgb(0 0 0 / 28%);
+  pointer-events: none;
+  user-select: none;
+  color: rgb(255, 208, 125);
+  font: 400 clamp(40px, 8vw, 96px)/1.2 "Rubik Wet Paint", cursive;
+  text-align: center;
+  text-shadow: 0 4px 0 rgb(65, 31, 48), 0 0 32px rgb(255 132 30 / 70%), 0 8px 28px rgb(0 0 0 / 90%);
+  animation: turn-notice-in 240ms ease-out both;
+}
+.turn-notice[hidden], .game--entry > .turn-notice { display: none; }
+@keyframes turn-notice-in {
+  from { opacity: 0; transform: scale(.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .turn-notice { animation: none; } }
+.turn-notice strong { display: block; font: inherit; overflow-wrap: anywhere; }
+.turn-notice p { margin: 18px 0 0; color: rgb(237, 222, 241); font: 400 clamp(17px, 2vw, 24px)/1.4 "Oswald Variable", sans-serif; text-shadow: 0 2px 8px rgb(0 0 0 / 90%); }
+.turn-notice[data-kind=waiting], .turn-notice[data-kind=paused], .turn-notice[data-kind=session] { font-size: clamp(30px, 5.5vw, 72px); }
+.turn-notice > div { max-width: 1100px; }

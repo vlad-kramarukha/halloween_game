@@ -1,0 +1,39 @@
+.finish-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 28;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: rgb(10 7 17 / 84%);
+  color: rgb(246, 235, 252);
+  font: 400 21px/1.55 "Oswald Variable", sans-serif;
+}
+.finish-panel[hidden], .game--entry > .finish-panel { display: none; }
+.finish-panel__card {
+  width: min(100%, 560px);
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 32px;
+  border: 1px solid rgb(239, 170, 89);
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgb(61, 37, 65), rgb(28, 21, 39));
+  box-shadow: 0 0 48px rgb(255 153 44 / 18%), 0 24px 60px rgb(0 0 0 / 45%);
+  text-align: center;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(131, 84, 114) transparent;
+}
+.finish-panel__card--winner { width: min(100%, 800px); }
+.finish-panel__eyebrow { margin: 0 0 18px; font-size: 13px; letter-spacing: 2px; color: rgb(237, 183, 128); }
+.finish-panel h2 { margin: 0 0 18px; font: 400 clamp(29px, 4vw, 44px)/1.2 "Rubik Wet Paint", cursive; color: rgb(255, 208, 132); overflow-wrap: anywhere; }
+.finish-panel__avatar { display: block; width: 112px; height: 112px; margin: 0 auto 12px; object-fit: contain; filter: drop-shadow(0 0 20px rgb(255 162 55 / 26%)); }
+.finish-panel__name { margin: 0 0 20px; font-size: 24px; color: rgb(255, 214, 160); overflow-wrap: anywhere; }
+.finish-panel__subtitle { margin: 0 0 24px; font-size: 29px; font-weight: 600; }
+.finish-panel__text { text-align: left; margin: 0 0 22px; }
+.finish-panel__closing { margin: 26px 0; font-size: 27px; color: rgb(255, 208, 132); }
+.finish-panel button { display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: min(100%, 340px); min-height: 50px; margin: 0 auto; padding: 12px 18px; border: 1px solid rgb(255, 193, 118); border-radius: 12px; background: rgb(247, 165, 78); color: rgb(44, 26, 40); font: 600 20px/1.4 "Oswald Variable", sans-serif; text-align: center; cursor: pointer; }
+.finish-panel button:hover { background: rgb(255, 185, 103); }
+.finish-panel button:focus-visible { outline: 2px solid rgb(255, 222, 173); outline-offset: 4px; }
+@media (max-width: 600px) { .finish-panel { padding: 14px; font-size: 18px; } .finish-panel__card { padding: 24px 20px; max-height: calc(100dvh - 28px); } }

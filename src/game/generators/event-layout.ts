@@ -1,0 +1,1 @@
+export { createEventLayout } from '../../../shared/event-layout';

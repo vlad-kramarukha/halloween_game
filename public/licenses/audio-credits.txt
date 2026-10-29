@@ -1,0 +1,12 @@
+MUSIC
+Spooky / Classical Game Music Pack by AlkaKrab.
+https://alkakrab.itch.io/spooky-classical-game-music-pack
+Used files: Spooky 1.mp3 through Spooky 8.mp3.
+Author permits free commercial and non-commercial game use on the pack page.
+
+SOUND EFFECTS
+Free Game SFX Sampler by ahustga.
+https://ahustga.itch.io/free-game-sfx-sampler
+Royalty-free for personal and commercial projects; attribution not required.
+No resale or redistribution of the sounds as standalone assets.
+This project uses selected sounds from CozyChimeUI, Magic, Casino, Puzzle, Ranger, DarkAmbience, Sci-fiHUD, Retro8-bitUI and RetroArcadeAction.

@@ -1,0 +1,22 @@
+/* Scoped to the game. The admin entry point does not import these fonts. */
+#game { font-family: 'Oswald Variable', sans-serif; }
+#game button, #game input, #game select, #game textarea { font-family: inherit; }
+.join-panel h1 {
+  font-family: 'Rubik Wet Paint', cursive;
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0;
+  line-height: 1.12;
+}
+
+/* Uniform text alignment across the game's action buttons. */
+#game :is(.join-panel, .event-panel, .dice-panel) button:not([hidden]) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,62 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { io, type Socket } from 'socket.io-client';
+import { createGameServer } from './app.js';
+import { createTestRooms } from './test-rooms.js';
+import type { JoinReply, ActionReply } from '../shared/game.js';
+
+test('one browser owns one seat across tabs and rooms; reconnect, leave and kick release correctly', { timeout: 15000 }, async t => {
+  const server = createGameServer({ adminPassword: 'test-password' });
+  await new Promise<void>(resolve => server.httpServer.listen(0, '127.0.0.1', resolve));
+  const address = server.httpServer.address(); assert.ok(address && typeof address === 'object');
+  const url = 'http://127.0.0.1:' + address.port;
+  const invitations = await createTestRooms(url, server.adminPassword, ['first', 'second', 'third', 'fourth', 'tampered', 'missing']);
+  const sockets: Socket[] = [];
+  t.after(async () => { sockets.forEach(s => s.disconnect()); await new Promise<void>(resolve => server.io.close(() => resolve())); });
+  const identity = () => fetch(url + '/api/player', { method: 'POST', headers: { 'X-Game-Request': '1' } });
+  const response = await identity();
+  assert.match(response.headers.get('set-cookie')!, /HttpOnly; SameSite=Strict/);
+  const cookie = response.headers.get('set-cookie')!.split(';')[0];
+  const unchanged = await fetch(url + '/api/player', { method: 'POST', headers: { 'X-Game-Request': '1', Cookie: cookie } });
+  assert.equal(unchanged.headers.get('set-cookie'), null);
+  const connect = async (value = cookie) => {
+    const socket = io(url, { transports: ['websocket'], forceNew: true, reconnection: false, extraHeaders: { Cookie: value } });
+    sockets.push(socket);
+    await new Promise<void>((resolve, reject) => { socket.once('connect', resolve); socket.once('connect_error', reject); });
+    return socket;
+  };
+  const join = (socket: Socket, roomId: string, token?: string) => new Promise<JoinReply>((resolve, reject) => {
+    socket.timeout(2000).emit('game:join', { roomId, character: 'witch', token, invitationToken: invitations[roomId] }, (err: Error | null, result: JoinReply) => err ? reject(err) : resolve(result));
+  });
+  const a = await connect(); const b = await connect();
+  const results = await Promise.all([join(a, 'first'), join(b, 'second')]);
+  assert.equal(results.filter(r => r.ok).length, 1);
+  const active = results[0].ok ? a : b; const other = active === a ? b : a;
+  const first = results.find(r => r.ok)!; assert.ok(first.ok);
+  const room = first.state.roomId;
+  const duplicate = await join(other, room); assert.equal(duplicate.ok, false);
+  if (!duplicate.ok) assert.match(duplicate.error, /другой вкладке/);
+  assert.equal((await join(other, 'third')).ok, false);
+  const foreignCookie = (await identity()).headers.get('set-cookie')!.split(';')[0];
+  const foreign = await connect(foreignCookie);
+  assert.equal((await join(foreign, room, first.token)).ok, false);
+  const tampered = await connect(cookie.slice(0, -1) + (cookie.endsWith('0') ? '1' : '0'));
+  assert.equal((await join(tampered, 'tampered')).ok, false);
+  const noCookie = await connect(''); assert.equal((await join(noCookie, 'missing')).ok, false);
+  active.disconnect();
+  await new Promise(resolve => setTimeout(resolve, 30));
+  assert.equal((await join(other, 'third')).ok, false);
+  const restored = await join(other, room); assert.ok(restored.ok);
+  assert.equal(restored.playerId, first.playerId);
+  assert.equal(restored.state.players.length, 1);
+  assert.deepEqual(await new Promise<ActionReply>(resolve => other.emit('game:leave', resolve)), { ok: true });
+  const moved = await join(other, 'third'); assert.ok(moved.ok);
+  assert.notEqual(moved.playerId, first.playerId);
+  // Administrative removal must free the browser identity as well.
+  const login = await fetch(url + '/api/admin/login', { method: 'POST', headers: { 'X-Admin-Request': '1', 'Content-Type': 'application/json' }, body: JSON.stringify({ password: 'test-password' }) });
+  const adminCookie = login.headers.get('set-cookie')!.split(';')[0];
+  const kicked = new Promise<void>(resolve => other.once('disconnect', () => resolve()));
+  const kick = await fetch(url + '/api/admin/rooms/third/kick', { method: 'POST', headers: { 'X-Admin-Request': '1', 'Content-Type': 'application/json', Cookie: adminCookie }, body: JSON.stringify({ playerId: moved.playerId }) });
+  assert.equal(kick.status, 200); await kicked;
+  const afterKick = await connect(); assert.equal((await join(afterKick, 'fourth')).ok, true);
+});

@@ -1,0 +1,1 @@
+export { eventsConfig } from '../../shared/board-events';

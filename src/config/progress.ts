@@ -1,0 +1,20 @@
+export const progressConfig = {
+  maxWidth: 740,
+  bottom: 20,
+  sideGap: 20,
+  diceGap: 24,
+  markerSize: 26,
+  markerGap: 36,
+  laneSpacing: 44,
+  railY: 36,
+  updateInterval: 100,
+  colors: {
+    background: 'rgb(29, 23, 40)',
+    border: 'rgb(77, 60, 94)',
+    rail: 'rgb(69, 55, 85)',
+    fill: 'rgb(155, 117, 182)',
+    text: 'rgb(237, 227, 245)',
+    muted: 'rgb(179, 161, 194)',
+    accent: 'rgb(255, 179, 96)',
+  },
+} as const;

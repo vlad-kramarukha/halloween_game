@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <title>Админка · Halloween HR</title>
+</head>
+<body>
+  <main>
+    <header><div><p class="eyebrow">HALLOWEEN HR</p><h1>Управление игрой</h1></div><a href="/">Открыть игру ↗</a></header>
+    <p id="notice" role="status" aria-live="polite"></p>
+    <section id="login-panel" class="card login">
+      <h2>Вход администратора</h2>
+      <p>Пароль задан через ADMIN_PASSWORD или показан в консоли при запуске сервера.</p>
+      <form id="login-form"><label>Пароль<input id="password" type="password" autocomplete="current-password" required maxlength="256" /></label><button type="submit">Войти</button></form>
+    </section>
+    <section id="dashboard" hidden>
+      <div class="toolbar"><p id="summary"></p><div><button id="refresh" class="secondary">Обновить</button><button id="logout" class="secondary">Выйти</button></div></div>
+      <form id="create-room" class="card create-room"><label>Название комнаты<input id="new-room-name" maxlength="32" pattern="[a-zA-Z0-9_-]{1,32}" placeholder="Например hr-team (можно оставить пустым)" /></label><button id="create-room-button" type="submit">Создать комнату</button></form>
+      <div class="layout">
+        <aside class="card"><h2>Комнаты</h2><div id="rooms"></div><p id="empty-rooms" hidden>Создайте комнату и пригласите игроков.</p></aside>
+        <section class="card room-detail">
+          <div class="room-heading"><div><h2 id="room-name">Выберите комнату</h2><p id="room-status"></p></div><div class="room-actions"><button id="start" hidden>Начать игру</button><button id="pause" hidden>Пауза</button><button id="reset" class="danger" hidden>Сбросить сессию</button></div></div>
+          <section id="invitation" class="invitation" aria-label="Приглашение в комнату" hidden>
+            <label>Ссылка для игроков<input id="room-link" readonly /></label>
+            <button id="copy-room-link" type="button">Скопировать ссылку</button>
+            <p>Отправьте ссылку участникам. Она действует до перезапуска сервера.</p>
+          </section>
+          <p id="room-help">Состав и позиции обновляются каждые 2 секунды.</p>
+          <div class="table-scroll"><table id="players-table" hidden><thead><tr><th>Игрок</th><th>Подключение</th><th>Клетка</th><th>Перемещение</th><th>Участие</th></tr></thead><tbody id="players"></tbody></table></div>
+        </section>
+      </div>
+    </section>
+    <footer>Сброс возвращает игроков на старт. Перемещение отменяет текущий бросок. Номера клеток начинаются с 1.</footer>
+  </main>
+  <script type="module" src="/src/admin/main.ts"></script>
+</body>
+</html>
