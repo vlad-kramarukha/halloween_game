@@ -159,7 +159,7 @@ test('object consequences clamp at finish and reset cancels an unfinished target
   const rolling = await land(t, 'candy-cookie', [4]); rolling.act('roll'); rolling.room.reset(); await delay(10);
   assert.equal(rolling.room.snapshot().phase, 'waiting'); assert.deepEqual(rolling.positions(), [0, 0, 0]);
 });
-test('collected objects are shared, single-use, survive disconnects, and return only on reset', async t => {
+test('collected objects stay hidden during occupancy and reconnect, then return for the next player', async t => {
   const room = new GameRoom('collected', () => {}, { portalCells: [], eventCells: [], objectCells: new Map([[1, 'ghost']]), die: () => 1, rollDuration: 1, stepDuration: 0 });
   t.after(() => room.destroy());
   const a = room.join('a', { roomId: room.id, character: 'witch' });
@@ -182,10 +182,11 @@ test('collected objects are shared, single-use, survive disconnects, and return 
   assert.deepEqual(room.snapshot().collectedPickups, [1]);
   room.requestEvent('a-new', { eventId: room.snapshot().event!.id, action: 'continue' });
   assert.equal(room.snapshot().players[0].position, 6);
+  assert.deepEqual(room.snapshot().collectedPickups, []);
   room.requestRoll('b', room.snapshot().turnId);
-  await until(() => room.snapshot().phase === 'ready');
+  await until(() => room.snapshot().phase === 'event');
   assert.equal(room.snapshot().players[1].position, 1);
-  assert.equal(room.snapshot().event, null);
+  assert.equal(room.snapshot().event?.pickupId, 'ghost');
   assert.deepEqual(room.snapshot().collectedPickups, [1]);
   room.reset(); assert.deepEqual(room.snapshot().collectedPickups, []);
   room.start();
@@ -205,7 +206,7 @@ test('every object is consumed on landing before confirmation and movement chain
   s.act('continue');
   assert.equal(s.positions()[0], 6);
   assert.equal(s.room.snapshot().event?.cardId, 'object-coin');
-  assert.deepEqual(s.room.snapshot().collectedPickups, [1, 6]);
+  assert.deepEqual(s.room.snapshot().collectedPickups, [6]);
 });
 test('six-player route has consistent reward and penalty counts in every leg and rare group effects', () => {
   const reserved = new Set(createEventLayout(gameConfig.cellCount, eventsConfig).keys());
@@ -230,4 +231,45 @@ test('six-player route has consistent reward and penalty counts in every leg and
   for (const type of candyPlacement.types.filter(type => objectKind(type.id) === 'candy')) {
     assert.equal([...layout.values()].filter(id => id === type.id).length, 2);
   }
+});
+
+test('stationary pickups stay hidden without retriggering and restore on admin movement or removal', async t => {
+  const s = await land(t, 'coin');
+  const eventId = s.room.snapshot().event!.id;
+  s.act('continue');
+  assert.equal(s.room.snapshot().event, null);
+  assert.deepEqual(s.room.snapshot().collectedPickups, [1]);
+  s.room.disconnect('p0');
+  assert.deepEqual(s.room.snapshot().collectedPickups, [1]);
+  s.room.movePlayer(s.players[0].playerId, 3);
+  assert.deepEqual(s.room.snapshot().collectedPickups, []);
+
+  const second = await land(t, 'pumpkin');
+  assert.deepEqual(second.room.snapshot().collectedPickups, [1]);
+  second.room.kickPlayer(second.players[0].playerId);
+  assert.deepEqual(second.room.snapshot().collectedPickups, []);
+  assert.ok(eventId);
+});
+
+test('a pickup respawns when its collector leaves on an ordinary roll and does not reactivate under a stationary player', async t => {
+  const room = new GameRoom('respawn', () => {}, {
+    portalCells: [], eventCells: [], objectCells: new Map([[1, 'potion']]),
+    die: () => 1, rollDuration: 1, stepDuration: 0,
+  });
+  t.after(() => room.destroy());
+  room.join('a', { roomId: room.id, character: 'witch' });
+  room.join('b', { roomId: room.id, character: 'witch' });
+  room.start();
+  room.requestRoll('a', room.snapshot().turnId);
+  await until(() => room.snapshot().phase === 'event');
+  room.requestEvent('a', { eventId: room.snapshot().event!.id, action: 'continue' });
+  room.requestRoll('b', room.snapshot().turnId);
+  await until(() => room.snapshot().phase === 'ready');
+  assert.deepEqual(room.snapshot().collectedPickups, [1]);
+  assert.equal(room.snapshot().event, null);
+  room.requestRoll('a', room.snapshot().turnId);
+  await until(() => room.snapshot().phase === 'ready');
+  assert.deepEqual(room.snapshot().collectedPickups, []);
+  assert.equal(room.snapshot().players[1].position, 1);
+  assert.equal(room.snapshot().event, null);
 });

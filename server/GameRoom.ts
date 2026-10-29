@@ -38,7 +38,8 @@ export class GameRoom {
   private readonly boardEvents: BoardEvents;
   private readonly eventCells: Set<number>;
   private readonly objectCells: Map<number, PickupId>;
-  private readonly collectedPickups = new Set<number>();
+  // Hidden only while the player who picked the object still occupies its cell.
+  private readonly collectedPickups = new Map<number, string>();
   private readonly portalCells: Set<number>;
   private landings: { playerId: string; cell: number }[] = [];
   private readonly visitedEffects = new Set<string>();
@@ -82,7 +83,7 @@ export class GameRoom {
 
   snapshot(): GameState {
     return {
-      roomId: this.id, started: this.started, paused: this.clock.paused, collectedPickups: [...this.collectedPickups], revision: this.revision, turnId: this.turnId, phase: this.phase,
+      roomId: this.id, started: this.started, paused: this.clock.paused, collectedPickups: [...this.collectedPickups.keys()], revision: this.revision, turnId: this.turnId, phase: this.phase,
       players: this.members.map(({ player, effects }) => ({ ...player, effects: { ...effects } })), currentPlayerId: this.currentId,
       winnerId: this.winnerId, winner: this.winner ? { ...this.winner } : null, roll: this.roll ? { ...this.roll } : null, serverTime: this.now(), event: this.boardEvents.snapshot(), notice: this.notice, movement: this.movement ? { ...this.movement, moves: this.movement.moves.map(move => ({ ...move })) } : null,
     };
@@ -187,6 +188,7 @@ export class GameRoom {
 
   /** Drain confirmed arrivals in order, keeping the original player's turn until the chain finishes. */
   private resolveLandings(notice = ''): void {
+    this.restoreVacatedPickups();
     this.refreshWinner();
     if (this.winnerId) { this.finishTurn(notice); return; }
     while (this.landings.length) {
@@ -205,7 +207,7 @@ export class GameRoom {
       if (orange) this.boardEvents.start(member.player.id);
       else if (portal) this.boardEvents.start(member.player.id, objectEventCards.portal, 'portal');
       else if (object) {
-        this.collectedPickups.add(landing.cell);
+        this.collectedPickups.set(landing.cell, member.player.id);
         this.boardEvents.start(member.player.id, objectEventCards[objectKind(object)], object);
       }
       return;
@@ -410,6 +412,15 @@ export class GameRoom {
     this.phase = enoughPlayers ? 'ready' : 'waiting';
   }
 
-  private changed(): void { this.revision++; this.publish(this.snapshot()); }
+  private restoreVacatedPickups(): void {
+    for (const [cell, collectorId] of this.collectedPickups) {
+      if (!this.members.some(member => member.player.id === collectorId && member.player.position === cell)) {
+        this.collectedPickups.delete(cell);
+      }
+    }
+  }
+
+  private changed(): void { this.restoreVacatedPickups(); this.revision++; this.publish(this.snapshot()); }
   destroy(): void { this.boardEvents.cancel(); this.timer.clear(); }
 }
+

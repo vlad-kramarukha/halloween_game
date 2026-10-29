@@ -29,9 +29,9 @@ export class PlayerPieces {
       if (!piece) {
         piece = this.scene.add.container();
         const color = Phaser.Display.Color.RGBStringToColor(playerColors[player.slot]).color;
-        const base = this.scene.add.ellipse(0, 0, 30, 13, color, .9).setStrokeStyle(1, 0xffffff, .75);
-        const avatar = this.scene.add.image(0, -4, `character-${player.character}`).setDisplaySize(38, 38).setOrigin(.5, 1);
-        const label = this.scene.add.text(0, -46, '', { fontFamily: gameTextFont, fontSize: 10, color: playerColors[player.slot], stroke: 'rgb(20, 14, 30)', strokeThickness: 3 }).setOrigin(.5, 1).setResolution(2);
+        const base = this.scene.add.ellipse(0, 0, 44, 20, color, .9).setStrokeStyle(1, 0xffffff, .75);
+        const avatar = this.scene.add.image(0, -4, `character-${player.character}`).setDisplaySize(72, 72).setOrigin(.5, 1);
+        const label = this.scene.add.text(0, -82, '', { fontFamily: gameTextFont, fontSize: 12, color: playerColors[player.slot], stroke: 'rgb(20, 14, 30)', strokeThickness: 3 }).setOrigin(.5, 1).setResolution(2);
         piece.add([base, avatar, label]);
         this.layer.add(piece); this.pieces.set(player.id, piece);
       }
@@ -68,3 +68,5 @@ export class PlayerPieces {
 
   destroy(): void { this.scene.events.off(Phaser.Scenes.Events.UPDATE, this.update, this); this.layer.destroy(); this.pieces.clear(); }
 }
+
+

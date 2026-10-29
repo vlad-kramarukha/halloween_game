@@ -83,7 +83,7 @@ test('portal, orange, ghost and coin form one chain before the original turn adv
   s.act('continue');
   assert.equal(s.room.snapshot().phase, 'ready');
   assert.equal(s.room.snapshot().currentPlayerId, s.players[1].playerId);
-  assert.deepEqual(s.room.snapshot().collectedPickups, [17, 22]);
+  assert.deepEqual(s.room.snapshot().collectedPickups, [22]);
 });
 
 test('group effects enqueue the actual landing owners, preserve the original turn, and support pause and reconnect', t => {
